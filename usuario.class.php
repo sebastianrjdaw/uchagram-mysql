@@ -2,11 +2,11 @@
 // Clase - Usuario 
 // Uchagram
 
-class usuario
+class Usuario
 {
     private $rol;
     private $username;
-    private $password;
+    private $hashpassword;
 	private $email;
 
 	private $codigo;
@@ -33,13 +33,13 @@ class usuario
 	}
 
 
-	public function getPassword() {
-		return $this->password;
+	public function getHashpassword() {
+		return $this->hashpassword;
 	}
 	
 
-	public function setPassword($password): self {
-		$this->password = $password;
+	public function setHashpassword($hashpassword): self {
+		$this->hashpassword = $hashpassword;
 		return $this;
 	}
 
@@ -64,11 +64,11 @@ class usuario
 	}
 	
 
-    public function __construct($rol,$username,$password,$email)
+    public function Crear($rol,$username,$hashpassword,$email) //Constructor de la clase
     {
         $this->rol = $rol;
         $this->username = $username;
-        $this->password= $password;
+        $this->hashpassword= $hashpassword;
         $this->email= $email;
     }
 	public function obtenerNombre($codigo)

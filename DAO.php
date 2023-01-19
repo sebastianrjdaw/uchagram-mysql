@@ -35,14 +35,35 @@ class DAO {
     public static function gardarUsuario($usuario) {
         try {
             $stmt = self::$pdo->prepare("INSERT INTO usuarios (rol, username, hashpassword, email) VALUES (:rol, :usuario, :hashContrasinal, :email)");
-            $stmt->bindParam(":rol", $usuario->getRol());
-            $stmt->bindParam(":usuario", $usuario->getUsername());
-            $stmt->bindParam(":hashContrasinal", $usuario->getPassword());
-            $stmt->bindParam(":email", $usuario->getEmail());
+            $stmt->bindValue(":rol", $usuario->getRol());       //bindValue para tomar la variable de la clase usuario 
+            $stmt->bindValue(":usuario", $usuario->getUsername());
+            $stmt->bindValue(":hashContrasinal", $usuario->getHashpassword());
+            $stmt->bindValue(":email", $usuario->getEmail());
             $stmt->execute();
+
         } catch (PDOException $e) {
             echo "Erro: " . $e->getMessage();
         }
     }
+
+    //Funcion de inicio de sesion para login.php
+    public static function login($usuario, $password) {
+        $stmt = self::$pdo->prepare("SELECT * FROM usuarios WHERE username = :usuario");
+        $stmt->bindValue(":usuario", $usuario);
+        $stmt->execute();
+        $result = $stmt->fetchObject('Usuario');
+        if($result) {
+            if (hash_equals($result->getHashpassword(), crypt($password, $result->getHashpassword()))) { //Primero codifica la contraseña de input con el hash de la BD y luego las compara
+                $_SESSION['rol'] = $result->getRol();
+                return true;
+            }
+        }
+        return false;
+    }
+
+
+
 }
+
+
 ?>
