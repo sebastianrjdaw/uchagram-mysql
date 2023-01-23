@@ -50,7 +50,7 @@ include("DAO.php");
     $usuario = new Usuario();
     $usuario->Crear('user', $username, $haspassword, $email);
     DAO::gardarUsuario($usuario);
-    echo 'Añadido';
+    header('Location: login.php');
 } 
 
 ?>

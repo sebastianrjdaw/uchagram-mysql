@@ -8,16 +8,27 @@ Versión 1.0 #
 
 session_start();
 include('DAO.php');
+DAO::conectar();
+
+ini_set('display_errors', 1);
+ini_set('display_startup_errors', 1);
+error_reporting(E_ALL);
 
 
 
 
 //Gestion de Usuarios
 
-if(isset($_GET['eliminar'])){
-    $filaEliminar=$_GET['eliminar'];
-    unset($datos[$filaEliminar]);
+if(isset($_GET['eliminarU'])){
+    $filaEliminar=$_GET['eliminarU'];      //Posicion en el array de usuarios del user que queremos borrar
+    $usuarios=DAO::lerUsuarios();        //Obtener todos los usuarios
+    $codigo= $usuarios[$filaEliminar]->getCodigo();   //filtrar el usuario en la posicion y obtener su codigo
+    DAO::borrar($codigo);
 }
+
+
+
+
 
 if(isset($_POST['add'])){
   $rol = $_POST['rol'][0];
@@ -28,27 +39,8 @@ if(isset($_POST['add'])){
   $usuario->Crear($rol, $username, $haspassword, $email);
   DAO::gardarUsuario($usuario);
 }
-escribirUsuarios($datos);
 
 
-//Gestion de Publicaciones
-$datos2 = obtenerPublicaciones();
-if (isset($_GET['eliminar2'])) {
-  $filaEliminar2 = $_GET['eliminar2'];
-  unset($datos2[$filaEliminar2]);
-}
-
-//Vista de Publicaciones
-if (isset($_GET['ver'])) {
-  $filaVer = $_GET['ver'];
-  $cod = $filaVer[0];
-  setcookie('Codigo', $cod);
-  var_dump($filaVer);
-  var_dump($cod);
-   header('Location: publicacion.php');
-}
-
-escribirPublicaciones($datos2);
 
 
 
@@ -64,7 +56,6 @@ escribirPublicaciones($datos2);
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <title>Administracion</title>
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <!-- <link rel="stylesheet" type="text/css" media="screen" href="main.css" /> -->
     <link
       rel="stylesheet"
       type="text/css"
@@ -75,7 +66,7 @@ escribirPublicaciones($datos2);
   <body>
       <h2>GESTION DE USUARIOS</h2>
       <div class="form-body">
-      <form action="usuarios.php" method="post" id="registro">
+      <form action="admin.php" method="post" id="registro">
         <input type="text" name="username" placeholder="Nombre de Usuario" />
         <input type="password" name="password" placeholder="Introduce Contraseña" />
         <input type="email" name="email" placeholder="Introduce Email" />
@@ -102,41 +93,18 @@ escribirPublicaciones($datos2);
             <th> X </th>
           </tr>
           <?php
-            $contFila=0;
-            foreach($datos as $usuario) {
-          ?>
+          $contEliminar = 0;
+          $contModificar = 0;
+          $usuarios = DAO::lerUsuarios();
+          foreach ($usuarios as $usuario) {
+            ?>
           <tr>
-            <td><?php ?></td>
-            <td><?php ?></td>
-            <td><?php ?></td>
-            <td><?php ?></td>
-            <td><a href="usuarios.php?eliminar=<?php echo $contFila++; ?>">Eliminar</a></td>     
-          </tr>
-          <?php } ?>
-        </table>
-
-        <h2>GESTION DE PUBLICACIONES</h2>
-
-        <table>
-          <tr>
-            <th>CODIGO</th>
-            <th>TITULO</th>
-            <th>DATA</th>
-            <th>PUBLICADO</th>
-            <th>OPERACION</th>
-          </tr>
-          <?php
-          $datos2 = obtenerPublicaciones();
-          $contFila2=0;
-          $ver = 0;
-            foreach($datos2 as $publicacion) {
-          ?>
-          <tr>
-            <td><?php echo $publicacion->getCodigo()?></td>
-            <td><?php echo $publicacion->getTitulo()?></td>
-            <td><?php $hora = $publicacion->getDataPublicacion(); echo date("d-m-Y",$hora);?></td>
-            <td><?php var_dump($publicacion->publicado($hora)) ; ?></td>
-            <td><a href="usuarios.php?eliminar2=<?php echo $contFila2++; ?>">Eliminar /</a><a href="usuarios.php?ver=<?php echo $ver++; ?>"> Ver</a></td>     
+            <td><?php echo $usuario->getCodigo(); ?></td>
+            <td><?php echo $usuario->getUsername(); ?></td>
+            <td><?php echo $usuario->getHashpassword(); ?></td>
+            <td><?php echo $usuario->getEmail(); ?></td>
+            <td><?php echo $usuario->getRol(); ?></td>
+            <td><a href="admin.php?eliminarU=<?php echo $contEliminar++; ?>">Eliminar</a> /  <a href="modificar.php?id=<?php echo $usuario->getCodigo(); ?>">Modificar</a></td>     
           </tr>
           <?php } ?>
         </table>
